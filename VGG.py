@@ -26,10 +26,10 @@ def VGG16(x, n_classes, is_pretrain=True):
     x = tools.conv('conv5_3', x, 512, kernel_size=[3, 3], stride=[1, 1, 1, 1], is_pretrain=is_pretrain)
     x = tools.pool('pool3', x, kernel=[1, 2, 2, 1], stride=[1, 2, 2, 1], is_max_pool=True)
 
-    x = tools.FC_layer('fc6', x, out_nodes=4096)
-    x = tools.batch_norm(x)
-    x = tools.FC_layer('fc7', x, out_nodes=4096)
-    x = tools.batch_norm(x)
-    x = tools.FC_layer('fc8', x, out_nodes=n_classes)
+    x = tools.fc_layer('fc6', x, out_nodes=4096)
+    # x = tools.batch_norm(x)
+    x = tools.fc_layer('fc7', x, out_nodes=4096)
+    # x = tools.batch_norm(x)
+    x = tools.fc_layer('fc8', x, out_nodes=n_classes)
 
     return x
