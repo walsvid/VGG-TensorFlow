@@ -91,3 +91,17 @@ def optimize(loss, learning_rate, global_step):
         #optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
         train_op = optimizer.minimize(loss, global_step=global_step)
         return train_op
+
+
+def test_load():
+    data_path = './vgg16.npy'
+
+    data_dict = np.load(data_path, encoding='latin1').item()
+    keys = sorted(data_dict.keys())
+    for key in keys:
+        weights = data_dict[key][0]
+        biases = data_dict[key][1]
+        print('\n')
+        print(key)
+        print('weights shape: ', weights.shape)
+        print('biases shape: ', biases.shape)
