@@ -1,5 +1,8 @@
 # My settings
 *.npy
+data/*
+logs/train/*
+logs/val/*
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
