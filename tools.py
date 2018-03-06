@@ -64,8 +64,8 @@ def loss(logits, labels):
         cross_entropy = tf.nn.softmax_cross_entropy_with_logits(
             logits=logits, labels=labels, name='cross-entropy')
         loss = tf.reduce_mean(cross_entropy, name='loss')
-        tf.summary.scalar(scope + '/loss', loss)
-        return loss
+        summary = tf.summary.scalar(scope + '/loss', loss)
+        return loss, summary
 
 
 def accuracy(logits, labels):
@@ -73,8 +73,8 @@ def accuracy(logits, labels):
         correct = tf.equal(tf.arg_max(logits, 1), tf.arg_max(labels, 1))
         correct = tf.cast(correct, tf.float32)
         accuracy = tf.reduce_mean(correct) * 100.0
-        tf.summary.scalar(scope + '/accuracy', accuracy)
-    return accuracy
+        summary = tf.summary.scalar(scope + '/accuracy', accuracy)
+    return accuracy, summary
 
 
 def num_correct_prediction(logits, labels):
@@ -86,8 +86,7 @@ def num_correct_prediction(logits, labels):
 
 def optimize(loss, learning_rate, global_step):
     with tf.name_scope('optimizer'):
-        optimizer = tf.train.GradientDescentOptimizer(
-            learning_rate=learning_rate)
+        optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate)
         #optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
         train_op = optimizer.minimize(loss, global_step=global_step)
         return train_op
@@ -105,3 +104,12 @@ def test_load():
         print(key)
         print('weights shape: ', weights.shape)
         print('biases shape: ', biases.shape)
+
+
+def load_with_skip(data_path, session, skip_layer):
+    data_dict = np.load(data_path, encoding='latin1').item()
+    for key in data_dict:
+        if key not in skip_layer:
+            with tf.variable_scope(key, reuse=True):
+                for subkey, data in zip(('weights', 'biases'), data_dict[key]):
+                    session.run(tf.get_variable(subkey).assign(data))
