@@ -1,5 +1,6 @@
 # My settings
 *.npy
+.idea
 data/*
 logs/train/*
 logs/val/*
