@@ -1,5 +1,6 @@
 # My settings
 *.npy
+.idea
 data/*
 logs/train/*
 logs/val/*
@@ -20,7 +21,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
 lib64/
 parts/
 sdist/
