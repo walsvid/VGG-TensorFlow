@@ -1,17 +1,17 @@
 import os
 import tensorflow as tf
 import numpy as np
-from .base_data_loader import DataLoader
+from .data_loader import DataLoader
 
 
 class CIFAR10BinDataLoader(DataLoader):
-    def __init__(self, cfg_):
+    def __init__(self, config, is_train, is_shuffle):
         """
-        :type cfg_: dict
-        :param cfg_: initialization config
+        :type config: dict
+        :param config: initialization config
         CIFAR10 binary format: [label bytes, image bytes]
         """
-        super().__init__(cfg_)
+        super().__init__(config, is_train, is_shuffle)
         self.image_width = self.config['image_width']
         self.image_height = self.config['image_height']
         self.image_depth = self.config['image_depth']
@@ -21,9 +21,10 @@ class CIFAR10BinDataLoader(DataLoader):
 
         self.data_dir = self.config['data_dir']
         self.is_shuffle = self.config['is_shuffle']
-        self.is_train = self.config['is_train']
         self.batch_size = self.config['batch_size']
         self.n_classes = self.config['n_classes']
+
+        self.is_train = is_train
 
         self.filename_queue = self.load_data()
 

@@ -4,13 +4,18 @@ import numpy as np
 
 
 class DataLoader(object):
-    def __init__(self, cfg_, is_train_):
+    def __init__(self, config, is_train, is_shuffle):
         """
-        :type cfg_: dict
-        :param cfg_: input config
+        :param config: input config
+        :type config: dict
+        :param is_train: is in train phase
+        :type is_train: bool
+        :param is_shuffle: shuffle data
+        :type is_shuffle: bool
         """
-        self.config = cfg_
-        self.is_train = is_train_
+        self.config = config
+        self.is_train = is_train
+        self.is_shuffle = is_shuffle
 
     def load_data(self):
         pass
@@ -20,15 +25,16 @@ class DataLoader(object):
 
 
 class CIFAR10BinDataLoader(DataLoader):
-    def __init__(self, cfg_, is_train_):
+    def __init__(self, config, is_train, is_shuffle):
         """
-        :param cfg_: initialization config
-        :type cfg_: dict
-        :param is_train_: is in train phase
-        :type is_train_: bool
-        CIFAR10 binary format: [label bytes, image bytes]
+        :param config: input config
+        :type config: dict
+        :param is_train: is in train phase
+        :type is_train: bool
+        :param is_shuffle: shuffle data
+        :type is_shuffle: bool
         """
-        super().__init__(cfg_, is_train_)
+        super().__init__(config, is_train, is_shuffle)
         self.image_width = self.config['image_width']
         self.image_height = self.config['image_height']
         self.image_depth = self.config['image_depth']
@@ -37,7 +43,6 @@ class CIFAR10BinDataLoader(DataLoader):
         self.image_bytes = self.image_width * self.image_height * self.image_depth
 
         self.data_dir = self.config['data_dir']
-        self.is_shuffle = self.config['is_shuffle']
         self.batch_size = self.config['batch_size']
         self.n_classes = self.config['n_classes']
 
@@ -46,11 +51,11 @@ class CIFAR10BinDataLoader(DataLoader):
     def load_data(self):
         with tf.name_scope('input'):
             if self.is_train:
-                filenames = [os.path.join(self.data_dir, 'data_batch_%d.bin' % ii) for ii in np.arange(1, 6)]
+                file_names = [os.path.join(self.data_dir, 'data_batch_%d.bin' % ii) for ii in np.arange(1, 6)]
             else:
-                filenames = [os.path.join(self.data_dir, 'test_batch.bin')]
+                file_names = [os.path.join(self.data_dir, 'test_batch.bin')]
 
-            return tf.train.string_input_producer(filenames)
+            return tf.train.string_input_producer(file_names)
 
     def generate_batch(self):
         with tf.name_scope('input'):
