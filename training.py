@@ -3,7 +3,8 @@ import numpy as np
 import tensorflow as tf
 import tools
 import VGG
-from lib.data_loader.cifar10_bin_data_loader import CIFAR10BinDataLoader
+from lib.data_loader.data_loader import CIFAR10BinDataLoader
+from lib.utils.config import ConfigReader, TrainNetConfig
 
 IMG_W = 32
 IMG_H = 32
@@ -15,6 +16,9 @@ IS_PRETRAIN = True
 
 
 def train():
+    config_reader = ConfigReader('experiments/configs/vgg16.yml')
+    train_config = TrainNetConfig(config_reader.get_train_config())
+
     pre_trained_weights = './data/imagenet_models/vgg16.npy'
     data_dir = './data/datasets/cifar-10-batches-bin/'
     train_log_dir = './logs/train/'
@@ -42,8 +46,8 @@ def train():
                        }
 
     with tf.name_scope('input'):
-        train_loader = CIFAR10BinDataLoader(vgg_train_config)
-        test_loader = CIFAR10BinDataLoader(vgg_test_config)
+        train_loader = CIFAR10BinDataLoader(vgg_train_config, is_train=True, is_shuffle=True)
+        test_loader = CIFAR10BinDataLoader(vgg_test_config, is_train=False, is_shuffle=False)
         train_image_batch, train_label_batch = train_loader.generate_batch()
 
         val_image_batch, val_label_batch = test_loader.generate_batch()
