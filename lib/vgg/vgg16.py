@@ -74,7 +74,7 @@ class VGG16(Net):
             cross_entropy = tf.nn.softmax_cross_entropy_with_logits(
                 logits=logits, labels=labels, name='cross-entropy')
             self.loss = tf.reduce_mean(cross_entropy, name='loss')
-            loss_summary = tf.summary.scalar(scope + '/loss', self.loss)
+            loss_summary = tf.summary.scalar(scope, self.loss)
             self.summary.append(loss_summary)
 
     def cal_accuracy(self, logits, labels):
@@ -82,7 +82,7 @@ class VGG16(Net):
             correct = tf.equal(tf.arg_max(logits, 1), tf.arg_max(labels, 1))
             correct = tf.cast(correct, tf.float32)
             self.accuracy = tf.reduce_mean(correct) * 100.0
-            accuracy_summary = tf.summary.scalar(scope + '/accuracy', self.accuracy)
+            accuracy_summary = tf.summary.scalar(scope, self.accuracy)
             self.summary.append(accuracy_summary)
 
     # def num_correct_prediction(self, logits, labels):
