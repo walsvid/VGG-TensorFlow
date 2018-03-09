@@ -1,10 +1,15 @@
 import tensorflow as tf
-import os
+from lib.utils.config import Config, TrainNetConfig
 
 
-class BaseModel:
-    def __init__(self, config):
-        self.config = config
+class Net:
+    def __init__(self, cfg_):
+        """
+        :type cfg_: TrainNetConfig
+        :param cfg_:
+        """
+        self.config = cfg_
+        self.saver = None
         # init the global step
         self.init_global_step()
         # init the epoch counter
@@ -16,7 +21,7 @@ class BaseModel:
         self.saver.save(sess, self.config.checkpoint_dir, self.global_step_tensor)
         print("Model saved")
 
-    # load lateset checkpoint from the experiment path defined in config_file
+    # load latest checkpoint from the experiment path defined in config_file
     def load(self, sess):
         latest_checkpoint = tf.train.latest_checkpoint(self.config.checkpoint_dir)
         if latest_checkpoint:
@@ -24,13 +29,13 @@ class BaseModel:
             self.saver.restore(sess, latest_checkpoint)
             print("Model loaded")
 
-    # just inialize a tensorflow variable to use it as epoch counter
+    # just initialize a tensorflow variable to use it as epoch counter
     def init_cur_epoch(self):
         with tf.variable_scope('cur_epoch'):
             self.cur_epoch_tensor = tf.Variable(0, trainable=False, name='cur_epoch')
             self.increment_cur_epoch_tensor = tf.assign(self.cur_epoch_tensor, self.cur_epoch_tensor + 1)
 
-    # just inialize a tensorflow variable to use it as global step counter
+    # just initialize a tensorflow variable to use it as global step counter
     def init_global_step(self):
         # DON'T forget to add the global step tensor to the tensorflow trainer
         with tf.variable_scope('global_step'):

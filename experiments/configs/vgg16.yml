@@ -1,0 +1,22 @@
+TRAIN:
+  CHECKPOINT_DIR: './logs/train/'
+  MAX_TO_KEEP: 1000
+  LEARNING_RATE: 0.01
+  MAX_STEP: 15000
+  IS_PRETRAIN: True
+  PRE_TRAIN_WEIGHT: './data/imagenet_models/vgg16.npy'
+
+TEST:
+
+DATA:
+  N_CLASSES: 10
+  BATCH_SIZE: 32
+  DATASET_TYPE: 'BIN'
+  IMAGE_SIZE:
+    WIDTH: 32
+    HEIGHT: 32
+    DEPTH: 3
+  DATA_DIR: './data/datasets/cifar-10-batches-bin/'
+  IS_SHUFFLE: True
+  BIN:
+    LABEL_BYTES: 1
