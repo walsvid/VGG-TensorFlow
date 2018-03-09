@@ -1,13 +1,14 @@
 import os
 import tensorflow as tf
 import numpy as np
+from lib.utils.config import DataConfig
 
 
 class DataLoader(object):
     def __init__(self, config, is_train, is_shuffle):
         """
         :param config: input config
-        :type config: dict
+        :type config: DataConfig
         :param is_train: is in train phase
         :type is_train: bool
         :param is_shuffle: shuffle data
@@ -28,23 +29,23 @@ class CIFAR10BinDataLoader(DataLoader):
     def __init__(self, config, is_train, is_shuffle):
         """
         :param config: input config
-        :type config: dict
+        :type config: DataConfig
         :param is_train: is in train phase
         :type is_train: bool
         :param is_shuffle: shuffle data
         :type is_shuffle: bool
         """
         super().__init__(config, is_train, is_shuffle)
-        self.image_width = self.config['image_width']
-        self.image_height = self.config['image_height']
-        self.image_depth = self.config['image_depth']
+        self.image_width = self.config.image_width
+        self.image_height = self.config.image_height
+        self.image_depth = self.config.image_depth
 
-        self.label_bytes = self.config['label_bytes']
+        self.label_bytes = self.config.label_bytes
         self.image_bytes = self.image_width * self.image_height * self.image_depth
 
-        self.data_dir = self.config['data_dir']
-        self.batch_size = self.config['batch_size']
-        self.n_classes = self.config['n_classes']
+        self.data_dir = self.config.data_dir
+        self.batch_size = self.config.batch_size
+        self.n_classes = self.config.n_classes
 
         self.filename_queue = self.load_data()
 
@@ -91,3 +92,12 @@ class CIFAR10BinDataLoader(DataLoader):
             label_batch = tf.reshape(label_batch, [self.batch_size, self.n_classes])
 
             return image_batch, label_batch
+
+
+def load_with_skip(data_path, session, skip_layer):
+    data_dict = np.load(data_path, encoding='latin1').item()
+    for key in data_dict:
+        if key not in skip_layer:
+            with tf.variable_scope(key, reuse=True):
+                for subkey, data in zip(('weights', 'biases'), data_dict[key]):
+                    session.run(tf.get_variable(subkey).assign(data))
