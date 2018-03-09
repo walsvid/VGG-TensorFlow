@@ -9,6 +9,7 @@ class Net:
         :param cfg_:
         """
         self.config = cfg_
+        self.saver = None
         # init the global step
         self.init_global_step()
         # init the epoch counter

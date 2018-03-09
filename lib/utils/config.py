@@ -27,11 +27,24 @@ class TrainNetConfig(Config):
         self.image_width = self.config['IMAGE_SIZE']['WIDTH']
         self.image_height = self.config['IMAGE_SIZE']['HEIGHT']
         self.image_depth = self.config['IMAGE_SIZE']['DEPTH']
+        self.pre_train_weight = self.config['PRE_TRAIN_WEIGHT']
 
 
 class TestNetConfig(Config):
     def __init__(self, cfg_):
         super().__init__(cfg_)
+
+
+class DataConfig(Config):
+    def __init__(self, cfg_):
+        super().__init__(cfg_)
+        self.image_width = self.config['IMAGE_SIZE']['WIDTH']
+        self.image_height = self.config['IMAGE_SIZE']['HEIGHT']
+        self.image_depth = self.config['IMAGE_SIZE']['DEPTH']
+        self.label_bytes = self.config['BIN']['LABEL_BYTES']
+        self.data_dir = self.config['DATA_DIR']
+        self.batch_size = self.config['BATCH_SIZE']
+        self.n_classes = self.config['N_CLASSES']
 
 
 class ConfigReader(object):
