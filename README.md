@@ -47,3 +47,6 @@ Recommend using python virtual environment to train.
 ### Images
 **loss and accuracy**
 ![](http://ww1.sinaimg.cn/large/006rfyOZly1fp6oeuq2pvj31460fagoa.jpg)
+
+### Release
+v0.0.2
