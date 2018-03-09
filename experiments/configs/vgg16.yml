@@ -4,6 +4,7 @@ TRAIN:
   LEARNING_RATE: 0.01
   MAX_STEP: 15000
   IS_PRETRAIN: True
+  PRE_TRAIN_WEIGHT: './data/imagenet_models/vgg16.npy'
 
 TEST:
 
