@@ -11,3 +11,6 @@ class Logger(object):
         self.train_summary_writer = tf.summary.FileWriter(os.path.join(self.config.summary_dir, "train"),
                                                           self.sess.graph)
         self.test_summary_writer = tf.summary.FileWriter(os.path.join(self.config.summary_dir, "test"))
+
+    def summarize(self):
+        pass
