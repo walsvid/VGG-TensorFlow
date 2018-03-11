@@ -18,6 +18,9 @@ class VGG16(Net):
     def init_saver(self):
         pass
 
+    def get_summary(self):
+        return self.summary
+
     def conv(self, layer_name, bottom, out_channels, kernel_size=[3, 3], stride=[1, 1, 1, 1]):
         in_channels = bottom.get_shape()[-1]
         with tf.variable_scope(layer_name):
@@ -100,37 +103,36 @@ class VGG16(Net):
 
     def build_model(self):
 
-        with tf.name_scope('VGG16'):
-            self.conv1_1 = self.conv('conv1_1', self.x, 64, stride=[1, 1, 1, 1])
-            self.conv1_2 = self.conv('conv1_2', self.conv1_1, 64, stride=[1, 1, 1, 1])
-            self.pool1 = self.pool('pool1', self.conv1_2, kernel=[1, 2, 2, 1], stride=[1, 2, 2, 1], is_max_pool=True)
+        self.conv1_1 = self.conv('conv1_1', self.x, 64, stride=[1, 1, 1, 1])
+        self.conv1_2 = self.conv('conv1_2', self.conv1_1, 64, stride=[1, 1, 1, 1])
+        self.pool1 = self.pool('pool1', self.conv1_2, kernel=[1, 2, 2, 1], stride=[1, 2, 2, 1], is_max_pool=True)
 
-            self.conv2_1 = self.conv('conv2_1', self.pool1, 128, stride=[1, 1, 1, 1])
-            self.conv2_2 = self.conv('conv2_2', self.conv2_1, 128, stride=[1, 1, 1, 1])
-            self.pool2 = self.pool('pool2', self.conv2_2, kernel=[1, 2, 2, 1], stride=[1, 2, 2, 1], is_max_pool=True)
+        self.conv2_1 = self.conv('conv2_1', self.pool1, 128, stride=[1, 1, 1, 1])
+        self.conv2_2 = self.conv('conv2_2', self.conv2_1, 128, stride=[1, 1, 1, 1])
+        self.pool2 = self.pool('pool2', self.conv2_2, kernel=[1, 2, 2, 1], stride=[1, 2, 2, 1], is_max_pool=True)
 
-            self.conv3_1 = self.conv('conv3_1', self.pool2, 256, stride=[1, 1, 1, 1])
-            self.conv3_2 = self.conv('conv3_2', self.conv3_1, 256, stride=[1, 1, 1, 1])
-            self.conv3_3 = self.conv('conv3_3', self.conv3_2, 256, stride=[1, 1, 1, 1])
-            self.pool3 = self.pool('pool3', self.conv3_3, kernel=[1, 2, 2, 1], stride=[1, 2, 2, 1], is_max_pool=True)
+        self.conv3_1 = self.conv('conv3_1', self.pool2, 256, stride=[1, 1, 1, 1])
+        self.conv3_2 = self.conv('conv3_2', self.conv3_1, 256, stride=[1, 1, 1, 1])
+        self.conv3_3 = self.conv('conv3_3', self.conv3_2, 256, stride=[1, 1, 1, 1])
+        self.pool3 = self.pool('pool3', self.conv3_3, kernel=[1, 2, 2, 1], stride=[1, 2, 2, 1], is_max_pool=True)
 
-            self.conv4_1 = self.conv('conv4_1', self.pool3, 512, stride=[1, 1, 1, 1])
-            self.conv4_2 = self.conv('conv4_2', self.conv4_1, 512, stride=[1, 1, 1, 1])
-            self.conv4_3 = self.conv('conv4_3', self.conv4_2, 512, stride=[1, 1, 1, 1])
-            self.pool4 = self.pool('pool4', self.conv4_3, kernel=[1, 2, 2, 1], stride=[1, 2, 2, 1], is_max_pool=True)
+        self.conv4_1 = self.conv('conv4_1', self.pool3, 512, stride=[1, 1, 1, 1])
+        self.conv4_2 = self.conv('conv4_2', self.conv4_1, 512, stride=[1, 1, 1, 1])
+        self.conv4_3 = self.conv('conv4_3', self.conv4_2, 512, stride=[1, 1, 1, 1])
+        self.pool4 = self.pool('pool4', self.conv4_3, kernel=[1, 2, 2, 1], stride=[1, 2, 2, 1], is_max_pool=True)
 
-            self.conv5_1 = self.conv('conv5_1', self.pool4, 512, stride=[1, 1, 1, 1])
-            self.conv5_2 = self.conv('conv5_2', self.conv5_1, 512, stride=[1, 1, 1, 1])
-            self.conv5_3 = self.conv('conv5_3', self.conv5_2, 512, stride=[1, 1, 1, 1])
-            self.pool5 = self.pool('pool5', self.conv5_3, kernel=[1, 2, 2, 1], stride=[1, 2, 2, 1], is_max_pool=True)
+        self.conv5_1 = self.conv('conv5_1', self.pool4, 512, stride=[1, 1, 1, 1])
+        self.conv5_2 = self.conv('conv5_2', self.conv5_1, 512, stride=[1, 1, 1, 1])
+        self.conv5_3 = self.conv('conv5_3', self.conv5_2, 512, stride=[1, 1, 1, 1])
+        self.pool5 = self.pool('pool5', self.conv5_3, kernel=[1, 2, 2, 1], stride=[1, 2, 2, 1], is_max_pool=True)
 
-            self.fc6 = self.fc('fc6', self.pool5, out_nodes=4096)
-            self.batch_norm1 = self.bn('batch_norm1', self.fc6)
-            self.fc7 = self.fc('fc7', self.batch_norm1, out_nodes=4096)
-            self.batch_norm2 = self.bn('batch_norm2', self.fc7)
-            self.logits = self.fc('fc8', self.batch_norm2, out_nodes=self.config.n_classes)
+        self.fc6 = self.fc('fc6', self.pool5, out_nodes=4096)
+        self.batch_norm1 = self.bn('batch_norm1', self.fc6)
+        self.fc7 = self.fc('fc7', self.batch_norm1, out_nodes=4096)
+        self.batch_norm2 = self.bn('batch_norm2', self.fc7)
+        self.logits = self.fc('fc8', self.batch_norm2, out_nodes=self.config.n_classes)
 
-            self.cal_loss(self.logits, self.y)
-            self.cal_accuracy(self.logits, self.y)
-            train_op = self.optimize()
-            return train_op
+        self.cal_loss(self.logits, self.y)
+        self.cal_accuracy(self.logits, self.y)
+        train_op = self.optimize()
+        return train_op
