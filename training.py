@@ -1,31 +1,34 @@
 import os
 import numpy as np
 import tensorflow as tf
-from lib.data_loader.data_loader import CIFAR10BinDataLoader, load_with_skip
+from lib.data_loader.data_loader import CIFAR10BinDataLoader
 from lib.utils.config import ConfigReader, TrainNetConfig, DataConfig
 from lib.vgg.vgg16 import VGG16
 
 
 def train():
     config_reader = ConfigReader('experiments/configs/vgg16.yml')
-    train_net_config = TrainNetConfig(config_reader.get_train_config())
+    train_config = TrainNetConfig(config_reader.get_train_config())
     data_config = DataConfig(config_reader.get_train_config())
-    max_step = train_net_config.max_step
-    pre_trained_weights = train_net_config.pre_train_weight
 
     train_log_dir = './logs/train/'
     val_log_dir = './logs/val/'
 
+    if not os.path.exists(train_log_dir):
+        os.makedirs(train_log_dir)
+    if not os.path.exists(val_log_dir):
+        os.makedirs(val_log_dir)
+
+    net = VGG16(train_config)
+
     with tf.name_scope('input'):
         train_loader = CIFAR10BinDataLoader(data_config, is_train=True, is_shuffle=True)
-        test_loader = CIFAR10BinDataLoader(data_config, is_train=False, is_shuffle=False)
         train_image_batch, train_label_batch = train_loader.generate_batch()
+        val_loader = CIFAR10BinDataLoader(data_config, is_train=False, is_shuffle=False)
+        val_image_batch, val_label_batch = val_loader.generate_batch()
 
-        val_image_batch, val_label_batch = test_loader.generate_batch()
-
-    net = VGG16(train_net_config)
     train_op = net.build_model()
-    summaries = net.summary
+    summaries = net.get_summary()
 
     saver = tf.train.Saver(tf.global_variables())
     summary_op = tf.summary.merge(summaries)
@@ -34,7 +37,7 @@ def train():
     sess = tf.Session()
     sess.run(init)
 
-    load_with_skip(pre_trained_weights, sess, ['fc6', 'fc7', 'fc8'])
+    net.load_with_skip(train_config.pre_train_weight, sess, ['fc6', 'fc7', 'fc8'])
 
     coord = tf.train.Coordinator()
     threads = tf.train.start_queue_runners(sess=sess, coord=coord)
@@ -43,24 +46,24 @@ def train():
     val_summary_writer = tf.summary.FileWriter(val_log_dir, sess.graph)
 
     try:
-        for step in np.arange(max_step):
+        for step in np.arange(train_config.max_step):
             if coord.should_stop():
                 break
 
             train_image, train_label = sess.run([train_image_batch, train_label_batch])
             _, train_loss, train_acc = sess.run([train_op, net.loss, net.accuracy], feed_dict={net.x: train_image, net.y: train_label})
 
-            if step % 50 == 0 or step + 1 == max_step:
+            if step % 50 == 0 or step + 1 == train_config.max_step:
                 print('===TRAIN===: Step: %d, loss: %.4f, accuracy: %.4f%%' % (step, train_loss, train_acc))
                 summary_str = sess.run(summary_op, feed_dict={net.x: train_image, net.y: train_label})
                 train_summary_writer.add_summary(summary_str, step)
-            if step % 200 == 0 or step + 1 == max_step:
+            if step % 200 == 0 or step + 1 == train_config.max_step:
                 val_image, val_label = sess.run([val_image_batch, val_label_batch])
                 val_loss, val_acc = sess.run([net.loss, net.accuracy], feed_dict={net.x: val_image, net.y: val_label})
                 print('====VAL====: Step %d, val loss = %.4f, val accuracy = %.4f%%' % (step, val_loss, val_acc))
                 summary_str = sess.run(summary_op, feed_dict={net.x: train_image, net.y: train_label})
                 val_summary_writer.add_summary(summary_str, step)
-            if step % 2000 == 0 or step + 1 == max_step:
+            if step % 2000 == 0 or step + 1 == train_config.max_step:
                 checkpoint_path = os.path.join(train_log_dir, 'model.ckpt')
                 saver.save(sess, checkpoint_path, global_step=step)
 

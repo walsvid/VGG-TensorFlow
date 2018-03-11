@@ -45,8 +45,16 @@ Recommend using python virtual environment to train.
 
 
 ### Images
-**loss and accuracy**
+#### loss and accuracy
 ![](http://ww1.sinaimg.cn/large/006rfyOZly1fp6oeuq2pvj31460fagoa.jpg)
+#### graph
+Please notice that the current Tensorboard shows that Graph is not beautified. Due to the low version of TensorFlow, using variable_scope when loading pre-trained weights will cause the creation of duplicate variable_scope. If you need to beautify Graph, please select a version of `tensorflow >=1.6.0` or use a temporary hack in `vgg16_legacy.py`.
+
+If your `tensorflow >=1.6.0`, please notice the solution in the current `vgg16.py` file, that is, use `auxiliary_name_scope=False` as the default parameter.
+|   origin   | beautified |
+| :--------: | :--------: |
+|![](http://ww1.sinaimg.cn/mw690/006rfyOZgy1fp951ac8vxj30pq0wq0w4.jpg)|![](http://ww1.sinaimg.cn/mw690/006rfyOZgy1fp94ieqek2j308q0v8wgc.jpg)|
+
 
 ### Release
 v0.0.2

@@ -3,7 +3,7 @@ import numpy as np
 from lib.networks.base_network import Net
 
 
-class VGG16(Net):
+class VGG16L(Net):
     def __init__(self, cfg_):
         super().__init__(cfg_)
         self.x = tf.placeholder(tf.float32, name='x', shape=[self.config.batch_size,
@@ -15,6 +15,7 @@ class VGG16(Net):
         self.loss = None
         self.accuracy = None
         self.summary = []
+        self.scope = {}
 
     def init_saver(self):
         pass
@@ -24,7 +25,8 @@ class VGG16(Net):
 
     def conv(self, layer_name, bottom, out_channels, kernel_size=[3, 3], stride=[1, 1, 1, 1]):
         in_channels = bottom.get_shape()[-1]
-        with tf.variable_scope(layer_name):
+        with tf.variable_scope(layer_name) as scope:
+            self.scope[layer_name] = scope
             w = tf.get_variable(name='weights',
                                 trainable=self.config.is_pretrain,
                                 shape=[kernel_size[0], kernel_size[1],
@@ -53,7 +55,8 @@ class VGG16(Net):
             size = shape[1].value * shape[2].value * shape[3].value
         else:  # x has already flattened
             size = shape[-1].value
-        with tf.variable_scope(layer_name):
+        with tf.variable_scope(layer_name) as scope:
+            self.scope[layer_name] = scope
             w = tf.get_variable('weights',
                                 shape=[size, out_nodes],
                                 initializer=tf.contrib.layers.xavier_initializer())
@@ -142,7 +145,7 @@ class VGG16(Net):
         data_dict = np.load(data_path, encoding='latin1').item()  # type: dict
         for key in data_dict.keys():
             if key not in skip_layer:
-                with tf.variable_scope(key, reuse=True, auxiliary_name_scope=False):
-                # with tf.variable_scope(key, reuse=True):
-                    for subkey, data in zip(('weights', 'biases'), data_dict[key]):
-                        session.run(tf.get_variable(subkey).assign(data))
+                with tf.variable_scope(self.scope[key], reuse=True) as scope:
+                    with tf.name_scope(scope.original_name_scope):
+                        for subkey, data in zip(('weights', 'biases'), data_dict[key]):
+                            session.run(tf.get_variable(subkey).assign(data))
