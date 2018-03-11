@@ -90,12 +90,3 @@ class CIFAR10BinDataLoader(DataLoader):
         label_batch = tf.reshape(label_batch, [self.batch_size, self.n_classes])
 
         return image_batch, label_batch
-
-
-def load_with_skip(data_path, session, skip_layer):
-    data_dict = np.load(data_path, encoding='latin1').item()
-    for key in data_dict:
-        if key not in skip_layer:
-            with tf.variable_scope(key, reuse=True):
-                for subkey, data in zip(('weights', 'biases'), data_dict[key]):
-                    session.run(tf.get_variable(subkey).assign(data))

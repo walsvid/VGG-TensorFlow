@@ -1,9 +1,8 @@
 import os
 import numpy as np
 import tensorflow as tf
-from lib.data_loader.data_loader import CIFAR10BinDataLoader, load_with_skip
+from lib.data_loader.data_loader import CIFAR10BinDataLoader
 from lib.utils.config import ConfigReader, TrainNetConfig, DataConfig
-from lib.utils.logger import Logger
 from lib.vgg.vgg16 import VGG16
 
 
@@ -19,8 +18,6 @@ def train():
         os.makedirs(train_log_dir)
     if not os.path.exists(val_log_dir):
         os.makedirs(val_log_dir)
-
-    # with tf.name_scope('input'):
 
     net = VGG16(train_config)
 
@@ -40,7 +37,7 @@ def train():
     sess = tf.Session()
     sess.run(init)
 
-    load_with_skip(train_config.pre_train_weight, sess, ['fc6', 'fc7', 'fc8'])
+    net.load_with_skip(train_config.pre_train_weight, sess, ['fc6', 'fc7', 'fc8'])
 
     coord = tf.train.Coordinator()
     threads = tf.train.start_queue_runners(sess=sess, coord=coord)

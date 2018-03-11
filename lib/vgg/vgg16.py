@@ -1,16 +1,17 @@
 import tensorflow as tf
+import numpy as np
 from lib.networks.base_network import Net
 
 
 class VGG16(Net):
     def __init__(self, cfg_):
         super().__init__(cfg_)
-        self.x = tf.placeholder(tf.float32, shape=[self.config.batch_size,
-                                                   self.config.image_width,
-                                                   self.config.image_height,
-                                                   self.config.image_depth])
-        self.y = tf.placeholder(tf.int16, shape=[self.config.batch_size,
-                                                 self.config.n_classes])
+        self.x = tf.placeholder(tf.float32, name='x', shape=[self.config.batch_size,
+                                                             self.config.image_width,
+                                                             self.config.image_height,
+                                                             self.config.image_depth], )
+        self.y = tf.placeholder(tf.int16, name='y', shape=[self.config.batch_size,
+                                                           self.config.n_classes])
         self.loss = None
         self.accuracy = None
         self.summary = []
@@ -136,3 +137,12 @@ class VGG16(Net):
         self.cal_accuracy(self.logits, self.y)
         train_op = self.optimize()
         return train_op
+
+    def load_with_skip(self, data_path, session, skip_layer):
+        data_dict = np.load(data_path, encoding='latin1').item()  # type: dict
+        for key in data_dict.keys():
+            if key not in skip_layer:
+                with tf.variable_scope(key, reuse=True, auxiliary_name_scope=False):
+                # with tf.variable_scope(key, reuse=True):
+                    for subkey, data in zip(('weights', 'biases'), data_dict[key]):
+                        session.run(tf.get_variable(subkey).assign(data))
