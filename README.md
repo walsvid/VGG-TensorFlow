@@ -57,4 +57,4 @@ If your `tensorflow >=1.6.0`, please notice the solution in the current `vgg16.p
 
 
 ### Release
-v0.0.2
+v0.0.3
