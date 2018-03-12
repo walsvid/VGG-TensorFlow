@@ -90,3 +90,28 @@ class CIFAR10BinDataLoader(DataLoader):
         label_batch = tf.reshape(label_batch, [self.batch_size, self.n_classes])
 
         return image_batch, label_batch
+
+
+class CIFAR10ImageDataLoader(DataLoader):
+    def __init__(self, config, is_train, is_shuffle):
+        """
+        :param config: input config
+        :type config: DataConfig
+        :param is_train: is in train phase
+        :type is_train: bool
+        :param is_shuffle: shuffle data
+        :type is_shuffle: bool
+        """
+        super().__init__(config, is_train, is_shuffle)
+        self.image_width = self.config.image_width
+        self.image_height = self.config.image_height
+        self.image_depth = self.config.image_depth
+
+        self.data_dir = self.config.data_dir
+        self.batch_size = self.config.batch_size
+        self.n_classes = self.config.n_classes
+
+        self.filename_queue = self.load_data()
+
+    def load_data(self):
+        return 0
