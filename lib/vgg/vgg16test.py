@@ -9,10 +9,8 @@ class VGG16_test(Net):
         self.x = tf.placeholder(tf.float32, name='x', shape=[1,
                                                              self.config.image_width,
                                                              self.config.image_height,
-                                                             self.config.image_depth], )
+                                                             self.config.image_depth])
         self.y = tf.placeholder(tf.int16, name='y', shape=[1, self.config.n_classes])
-        self.loss = None
-        self.accuracy = None
 
     def init_saver(self):
         pass
@@ -97,9 +95,7 @@ class VGG16_test(Net):
         self.pool5 = self.pool('pool5', self.conv5_3, kernel=[1, 2, 2, 1], stride=[1, 2, 2, 1], is_max_pool=True)
 
         self.fc6 = self.fc('fc6', self.pool5, out_nodes=4096)
-        self.batch_norm1 = self.bn('batch_norm1', self.fc6)
-        self.fc7 = self.fc('fc7', self.batch_norm1, out_nodes=4096)
-        self.batch_norm2 = self.bn('batch_norm2', self.fc7)
-        self.logits = self.fc('fc8', self.batch_norm2, out_nodes=self.config.n_classes)
+        self.fc7 = self.fc('fc7', self.fc6, out_nodes=4096)
+        self.logits = self.fc('fc8', self.fc7, out_nodes=self.config.n_classes)
 
         return self.logits

@@ -1,23 +1,35 @@
-import os
-import numpy as np
+import argparse
 import tensorflow as tf
 from scipy.misc import imread, imresize
-from lib.data_loader.data_loader import CIFAR10BinDataLoader
-from lib.utils.config import ConfigReader, TestNetConfig, DataConfig
+from lib.utils.config import ConfigReader, TestNetConfig
 from lib.vgg.vgg16test import VGG16_test
 
 
-if __name__ == '__main__':
+def parse_args():
+    """Parse input arguments."""
+    parser = argparse.ArgumentParser(description='VGG test demo')
+    parser.add_argument('--net', dest='demo_net', help='Network to use [vgg16]',
+                        default='VGGnet_test')
+    parser.add_argument('--im', dest='im_path', help='Path to the image',
+                        default='data/demo/demo.jpg', type=str)
+    parser.add_argument('--model', dest='model', help='Model path', default='./')
+    parser.add_argument('--meta', dest='meta', help='Dataset meta info, class names',
+                        default='./data/datasets/cifar-10-batches-bin/batches.meta.txt', type=str)
+    args = parser.parse_args()
 
+    return args
+
+
+def test_net():
+    args = parse_args()
     config_reader = ConfigReader('experiments/configs/vgg16.yml')
     test_config = TestNetConfig(config_reader.get_test_config())
-    data_config = DataConfig(config_reader.get_test_config())
 
     mode = 'RGB' if test_config.image_depth == 3 else 'L'
-    img = imread('automobile10.png', mode=mode)
-    img = imresize(img, [test_config.image_height, test_config.image_width]) # height, width
-    k = 3
-    with open('./data/datasets/cifar-10-batches-bin/batches.meta.txt') as mf:
+    img = imread(args.im_path, mode=mode)
+    img = imresize(img, [test_config.image_height, test_config.image_width])  # height, width
+    k = 1  # select top k
+    with open(args.meta) as mf:
         class_names = mf.read().splitlines()
         class_names = list(filter(None, class_names))
 
@@ -30,7 +42,7 @@ if __name__ == '__main__':
     saver = tf.train.Saver()
     sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
 
-    print(ckpt_path)
+    print('Model checkpoint path: {}'.format(ckpt_path))
     try:
         ckpt = tf.train.get_checkpoint_state(ckpt_path)
         print('Restoring from {}...'.format(ckpt.model_checkpoint_path), end=' ')
@@ -42,7 +54,11 @@ if __name__ == '__main__':
     [prob, ind, out] = sess.run([values, indices, logits], feed_dict={net.x: [img]})
     prob = prob[0]
     ind = ind[0]
-    print('\nClassification Result:')
+    print('Classification Result:')
     for i in range(k):
-        print('\tCategory Name: %s \n\tProbability: %.2f%%\n' % (class_names[ind[i]], prob[i] * 100))
+        print('Category Name: %s \nProbability: %.2f%%' % (class_names[ind[i]], prob[i] * 100))
     sess.close()
+
+
+if __name__ == '__main__':
+    test_net()
