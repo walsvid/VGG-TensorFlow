@@ -43,6 +43,16 @@ python ./training.py
 ```
 Recommend using python virtual environment to train.
 
+### Test
+Simply run this script to view the detail of arguments:
+```bash
+python ./test.py --help
+```
+To test image please run
+```bash
+python ./test.py --im <your_image_path>
+```
+You can modify the checkpoint path im `experiments/configs/vgg16.yaml`, please reference `TEST.MODEL_PATH` for more detail.
 
 ### Images
 #### loss and accuracy
@@ -57,4 +67,4 @@ If your `tensorflow >=1.6.0`, please notice the solution in the current `vgg16.p
 
 
 ### Release
-v0.0.3
+v0.0.4
