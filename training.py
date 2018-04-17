@@ -3,7 +3,11 @@ import numpy as np
 import tensorflow as tf
 from lib.data_loader.data_loader import CIFAR10BinDataLoader
 from lib.utils.config import ConfigReader, TrainNetConfig, DataConfig
-from lib.vgg.vgg16 import VGG16
+
+if tf.__version__ < '1.6.0':
+    from lib.vgg.vgg16_legacy import VGG16L as VGG16
+else:
+    from lib.vgg.vgg16 import VGG16
 
 
 def train():
