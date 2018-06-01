@@ -86,7 +86,7 @@ class VGG16L(Net):
 
     def cal_accuracy(self, logits, labels):
         with tf.name_scope('accuracy') as scope:
-            correct = tf.equal(tf.arg_max(logits, 1), tf.arg_max(labels, 1))
+            correct = tf.equal(tf.argmax(logits, 1), tf.argmax(labels, 1))
             correct = tf.cast(correct, tf.float32)
             self.accuracy = tf.reduce_mean(correct) * 100.0
             accuracy_summary = tf.summary.scalar(scope, self.accuracy)
