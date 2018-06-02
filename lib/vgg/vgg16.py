@@ -73,6 +73,12 @@ class VGG16(Net):
                                                scale=None, variance_epsilon=epsilon)
             return bottom
 
+    def batch_normalization(self, layer_name, bottom, training=True):
+        with tf.name_scope(layer_name):
+            epsilon = 1e-3
+            bottom = tf.layers.batch_normalization(bottom, epsilon=epsilon, training=training)
+            return bottom
+
     def cal_loss(self, logits, labels):
         with tf.name_scope('loss') as scope:
             cross_entropy = tf.nn.softmax_cross_entropy_with_logits(
@@ -83,7 +89,7 @@ class VGG16(Net):
 
     def cal_accuracy(self, logits, labels):
         with tf.name_scope('accuracy') as scope:
-            correct = tf.equal(tf.arg_max(logits, 1), tf.arg_max(labels, 1))
+            correct = tf.equal(tf.argmax(logits, 1), tf.argmax(labels, 1))
             correct = tf.cast(correct, tf.float32)
             self.accuracy = tf.reduce_mean(correct) * 100.0
             accuracy_summary = tf.summary.scalar(scope, self.accuracy)
@@ -128,9 +134,9 @@ class VGG16(Net):
         self.pool5 = self.pool('pool5', self.conv5_3, kernel=[1, 2, 2, 1], stride=[1, 2, 2, 1], is_max_pool=True)
 
         self.fc6 = self.fc('fc6', self.pool5, out_nodes=4096)
-        self.batch_norm1 = self.bn('batch_norm1', self.fc6)
+        self.batch_norm1 = self.batch_normalization('batch_norm1', self.fc6, training=self.is_training)
         self.fc7 = self.fc('fc7', self.batch_norm1, out_nodes=4096)
-        self.batch_norm2 = self.bn('batch_norm2', self.fc7)
+        self.batch_norm2 = self.batch_normalization('batch_norm2', self.fc7, training=self.is_training)
         self.logits = self.fc('fc8', self.batch_norm2, out_nodes=self.config.n_classes)
 
         self.cal_loss(self.logits, self.y)
