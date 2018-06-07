@@ -17,6 +17,7 @@ class TrainNetConfig(Config):
         :param cfg_:
         """
         super().__init__(cfg_)
+        self.mode = self.config['MODE']
         self.checkpoint_dir = self.config['CHECKPOINT_DIR']
         self.max_to_keep = self.config['MAX_TO_KEEP']
         self.n_classes = self.config['N_CLASSES']
@@ -33,6 +34,7 @@ class TrainNetConfig(Config):
 class TestNetConfig(Config):
     def __init__(self, cfg_):
         super().__init__(cfg_)
+        self.mode = self.config['MODE']
         self.model_path = self.config['MODEL_PATH']
         self.image_width = self.config['IMAGE_SIZE']['WIDTH']
         self.image_height = self.config['IMAGE_SIZE']['HEIGHT']
