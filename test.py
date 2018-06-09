@@ -2,7 +2,7 @@ import argparse
 import tensorflow as tf
 from scipy.misc import imread, imresize
 from lib.utils.config import ConfigReader, TestNetConfig
-from lib.vgg.vgg16test import VGG16_test
+from lib.vgg.vgg16 import VGG16
 
 
 def parse_args():
@@ -51,7 +51,7 @@ def test_net():
     except FileNotFoundError:
         raise 'Check your pretrained {:s}'.format(ckpt_path)
 
-    [prob, ind, out] = sess.run([values, indices, logits], feed_dict={net.x: [img]})
+    prob, ind, out = sess.run([values, indices, logits], feed_dict={net.x: [img]})
     prob = prob[0]
     ind = ind[0]
     print('Classification Result:')
