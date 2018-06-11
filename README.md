@@ -32,7 +32,7 @@ data
 ```
 
 ### Training
-All configuration of data and training can be modified in the file. Use the more readable yaml file format as the configuration file. 
+All configuration of data and training can be modified in the file. Use the more readable yaml file format as the configuration file.
 
 For more details, please refer to `experiments/configs/vgg16.yaml`
 
@@ -69,7 +69,17 @@ The test result of image above, the classification result is **automobile**, and
 ![](http://ww1.sinaimg.cn/large/006rfyOZgy1fqlp1f2dhyj30oa056js6.jpg)
 
 ### graph
-Please notice that the current Tensorboard shows that Graph is not beautified. Due to the low version of TensorFlow, using variable_scope when loading pre-trained weights will cause the creation of duplicate variable_scope. If you need to beautify Graph, please select a version of `tensorflow >=1.6.0` or use a temporary hack in `vgg16_legacy.py`.
+Please notice that the current Tensorboard shows that Graph is not beautified. Due to the low version of TensorFlow, using variable_scope when loading pre-trained weights will cause the creation of duplicate variable_scope. If you need to beautify Graph, please select a version of `tensorflow >=1.6.0` or use a temporary hack as below:
+```python
+def load_with_skip(self, data_path, session, skip_layer):
+    data_dict = np.load(data_path, encoding='latin1').item()  # type: dict
+    for key in data_dict.keys():
+        if key not in skip_layer:
+            with tf.variable_scope(self.scope[key], reuse=True) as scope:
+                with tf.name_scope(scope.original_name_scope):
+                    for subkey, data in zip(('weights', 'biases'), data_dict[key]):
+                        session.run(tf.get_variable(subkey).assign(data))
+```
 
 If your `tensorflow >=1.6.0`, please notice the solution in the current `vgg16.py` file, that is, use `auxiliary_name_scope=False` as the default parameter.
 
