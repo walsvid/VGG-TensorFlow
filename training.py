@@ -3,11 +3,12 @@ import numpy as np
 import tensorflow as tf
 from lib.data_loader.data_loader import CIFAR10BinDataLoader
 from lib.utils.config import ConfigReader, TrainNetConfig, DataConfig
+from lib.vgg.vgg16 import VGG16
 
-if tf.__version__ < '1.6.0':
-    from lib.vgg.vgg16_legacy import VGG16L as VGG16
-else:
-    from lib.vgg.vgg16 import VGG16
+#if tf.__version__ < '1.6.0':
+#    from lib.vgg.vgg16_legacy import VGG16L as VGG16
+#else:
+#    from lib.vgg.vgg16 import VGG16
 
 
 def train():
@@ -63,10 +64,12 @@ def train():
                 train_summary_writer.add_summary(summary_str, step)
             if step % 200 == 0 or step + 1 == train_config.max_step:
                 val_image, val_label = sess.run([val_image_batch, val_label_batch])
-                val_loss, val_acc = sess.run([net.loss, net.accuracy], feed_dict={net.x: val_image, net.y: val_label})
+                plot_images = tf.summary.image('val_images_{}'.format(step % 200), val_image, 10)
+                val_loss, val_acc, plot_summary = sess.run([net.loss, net.accuracy, plot_images], feed_dict={net.x: val_image, net.y: val_label})
                 print('====VAL====: Step %d, val loss = %.4f, val accuracy = %.4f%%' % (step, val_loss, val_acc))
                 summary_str = sess.run(summary_op, feed_dict={net.x: train_image, net.y: train_label})
                 val_summary_writer.add_summary(summary_str, step)
+                val_summary_writer.add_summary(plot_summary, step)
             if step % 2000 == 0 or step + 1 == train_config.max_step:
                 checkpoint_path = os.path.join(train_log_dir, 'model.ckpt')
                 saver.save(sess, checkpoint_path, global_step=step)
