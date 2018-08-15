@@ -9,6 +9,7 @@ class Net:
         :param cfg_:
         """
         self.config = cfg_
+        self.is_training = True if self.config.mode == 'TRAIN' else False
         self.saver = None
         # init the global step
         self.init_global_step()

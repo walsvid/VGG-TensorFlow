@@ -1,4 +1,5 @@
 TRAIN:
+  MODE: 'TRAIN'
   CHECKPOINT_DIR: './logs/train/'
   MAX_TO_KEEP: 1000
   LEARNING_RATE: 0.01
@@ -7,6 +8,7 @@ TRAIN:
   PRE_TRAIN_WEIGHT: './data/imagenet_models/vgg16.npy'
 
 TEST:
+  MODE: 'TEST'
   MODEL_PATH: './logs/train/'
 
 DATA:
