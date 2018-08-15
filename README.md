@@ -94,4 +94,4 @@ The **netscope** of VGG-16, visualized by tensorboard.
 
 
 ### Release
-v0.0.4
+v0.0.5
